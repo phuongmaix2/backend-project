@@ -16,15 +16,23 @@ class UserRepositoryTests {
     private UserRepository userRepository;
 
     @Test
-    void savesAndFindsUserByUsername() {
+    void savesUserWithNormalizedEmailAndDefaultValues() {
         User user = new User(
                 "mai",
-                "mai@example.com",
+                "  MAI@EXAMPLE.COM  ",
                 "encoded-password");
 
-        userRepository.save(user);
+        userRepository.saveAndFlush(user);
 
-        assertThat(userRepository.findByUsername("mai"))
-                .isPresent();
+        User savedUser = userRepository.findByUsername("mai")
+                .orElseThrow();
+
+        assertThat(savedUser.getId()).isNotNull();
+        assertThat(savedUser.getEmail()).isEqualTo("mai@example.com");
+        assertThat(savedUser.getPasswordHash()).isEqualTo("encoded-password");
+        assertThat(savedUser.getRole()).isEqualTo("USER");
+        assertThat(savedUser.getPreferredCurrency()).isEqualTo("EUR");
+        assertThat(savedUser.isEnabled()).isTrue();
+        assertThat(savedUser.getCreatedAt()).isNotNull();
     }
 }

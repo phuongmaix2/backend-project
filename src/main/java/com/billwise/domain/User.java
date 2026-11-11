@@ -1,10 +1,10 @@
-
 package com.billwise.domain;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Locale;
 
-//Represents a registered user in BillWise.
+// Represents a registered BillWise user.
 @Entity
 @Table(name = "app_users")
 public class User {
@@ -19,23 +19,37 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
-    // Stores the encoded password for authentication.
-    @Column(nullable = false)
-    private String password;
+    // Stores the encoded password, never the plain-text password.
+    @Column(name = "password_hash", nullable = false)
+    private String passwordHash;
 
     @Column(nullable = false)
     private String role = "USER";
 
-    private LocalDateTime createdAt;
+    @Column(name = "preferred_currency", nullable = false, length = 3)
+    private String preferredCurrency = "EUR";
 
-    public User() {
+    @Column(nullable = false)
+    private boolean enabled = true;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt = LocalDateTime.now();
+
+    protected User() {
     }
 
-    public User(String username, String email, String password) {
+    public User(String username, String email, String passwordHash) {
         this.username = username;
-        this.email = email;
-        this.password = password;
-        this.createdAt = LocalDateTime.now();
+        this.email = normalizeEmail(email);
+        this.passwordHash = passwordHash;
+    }
+
+    private static String normalizeEmail(String email) {
+        if (email == null) {
+            return null;
+        }
+
+        return email.trim().toLowerCase(Locale.ROOT);
     }
 
     public Long getId() {
@@ -55,15 +69,15 @@ public class User {
     }
 
     public void setEmail(String email) {
-        this.email = email;
+        this.email = normalizeEmail(email);
     }
 
-    public String getPassword() {
-        return password;
+    public String getPasswordHash() {
+        return passwordHash;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
     }
 
     public String getRole() {
@@ -72,6 +86,22 @@ public class User {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getPreferredCurrency() {
+        return preferredCurrency;
+    }
+
+    public void setPreferredCurrency(String preferredCurrency) {
+        this.preferredCurrency = preferredCurrency;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     public LocalDateTime getCreatedAt() {
