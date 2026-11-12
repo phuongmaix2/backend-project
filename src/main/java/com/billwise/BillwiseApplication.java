@@ -1,4 +1,3 @@
-
 package com.billwise;
 
 import com.billwise.domain.User;
@@ -8,9 +7,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 
 @SpringBootApplication
 public class BillwiseApplication {
@@ -20,21 +19,21 @@ public class BillwiseApplication {
     }
 
     // Adds a demo user when the application starts.
+    // Adds a demo user when the application starts.
     @Bean
-    public CommandLineRunner initializeDB(UserRepository userRepository) {
+    @Profile("!test")
+    public CommandLineRunner initializeDB(
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder) {
         return args -> {
 
             // Prevents duplicate demo users.
             if (!userRepository.existsByUsername("demo")) {
 
-                PasswordEncoder encoder =
-                    PasswordEncoderFactories.createDelegatingPasswordEncoder();
-
                 User user = new User(
-                    "demo",
-                    "demo@example.com",
-                    encoder.encode("DemoPassword123!")
-                );
+                        "demo",
+                        "demo@example.com",
+                        passwordEncoder.encode("DemoPassword123!"));
 
                 userRepository.save(user);
                 System.out.println("Demo user created!");
