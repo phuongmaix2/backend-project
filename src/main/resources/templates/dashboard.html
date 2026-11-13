@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dashboard | BillWise</title>
+</head>
+
+<body>
+    <header>
+        <h1>BillWise Dashboard</h1>
+
+        <form th:action="@{/logout}" method="post">
+            <button type="submit">Log out</button>
+        </form>
+    </header>
+
+    <main>
+        <h2>
+            Welcome,
+            <span th:text="${username}">user</span>!
+        </h2>
+
+        <p>
+            Your groups and expenses will appear here.
+        </p>
+    </main>
+</body>
+
+</html>
