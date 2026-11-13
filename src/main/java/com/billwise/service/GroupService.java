@@ -11,6 +11,9 @@ import com.billwise.repository.GroupMemberRepository;
 import com.billwise.repository.UserRepository;
 import com.billwise.web.dto.group.GroupRequest;
 import com.billwise.web.dto.group.GroupResponse;
+import com.billwise.exception.ConflictException;
+import com.billwise.web.dto.group.AddGroupMemberRequest;
+import com.billwise.web.dto.group.GroupMemberResponse;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -89,6 +92,86 @@ public class GroupService {
                 groupRepository.delete(group);
         }
 
+        @Transactional
+        public GroupMemberResponse addMember(
+                        Long groupId,
+                        String currentUsername,
+                        AddGroupMemberRequest request) {
+                User currentUser = findUser(currentUsername);
+                ExpenseGroup group = findGroup(groupId);
+
+                requireOwner(group, currentUser);
+
+                User newMember = findUserByUsernameOrEmail(
+                                request.getUsernameOrEmail());
+
+                boolean alreadyMember = memberRepository.existsByGroupIdAndUserId(
+                                groupId,
+                                newMember.getId());
+
+                if (alreadyMember) {
+                        throw new ConflictException(
+                                        "User is already a group member");
+                }
+
+                GroupMember membership = new GroupMember(
+                                group,
+                                newMember,
+                                GroupRole.MEMBER);
+
+                GroupMember savedMembership = memberRepository.save(membership);
+
+                return GroupMemberResponse.from(savedMembership);
+        }
+
+        @Transactional(readOnly = true)
+        public List<GroupMemberResponse> findMembers(
+                        Long groupId,
+                        String currentUsername) {
+
+                User currentUser = findUser(currentUsername);
+                ExpenseGroup group = findGroup(groupId);
+
+                boolean isMember = memberRepository.existsByGroupIdAndUserId(
+                                group.getId(),
+                                currentUser.getId());
+
+                if (!isMember) {
+                        throw new ForbiddenOperationException(
+                                        "You are not a member of this group");
+                }
+
+                return memberRepository
+                                .findByGroupIdOrderByJoinedAtAsc(groupId)
+                                .stream()
+                                .map(GroupMemberResponse::from)
+                                .toList();
+        }
+
+        @Transactional
+        public void removeMember(
+                        Long groupId,
+                        Long userId,
+                        String currentUsername) {
+
+                User currentUser = findUser(currentUsername);
+                ExpenseGroup group = findGroup(groupId);
+
+                requireOwner(group, currentUser);
+
+                if (Objects.equals(group.getOwner().getId(), userId)) {
+                        throw new ConflictException(
+                                        "The group owner cannot be removed");
+                }
+
+                GroupMember membership = memberRepository
+                                .findByGroupIdAndUserId(groupId, userId)
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                                "Group member not found"));
+
+                memberRepository.delete(membership);
+        }
+
         @Transactional(readOnly = true)
         public List<GroupResponse> findGroupsForUser(
                         String username) {
@@ -147,5 +230,24 @@ public class GroupService {
                         throw new ForbiddenOperationException(
                                         "Only the group owner can perform this operation");
                 }
+        }
+
+        private User findUserByUsernameOrEmail(
+                        String usernameOrEmail) {
+                String normalizedValue = usernameOrEmail
+                                .trim()
+                                .toLowerCase(Locale.ROOT);
+
+                if (normalizedValue.contains("@")) {
+                        return userRepository
+                                        .findByEmail(normalizedValue)
+                                        .orElseThrow(() -> new ResourceNotFoundException(
+                                                        "User not found"));
+                }
+
+                return userRepository
+                                .findByUsername(normalizedValue)
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                                "User not found"));
         }
 }
