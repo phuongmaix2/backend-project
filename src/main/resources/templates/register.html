@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Create account | BillWise</title>
+</head>
+
+<body>
+    <main>
+        <h1>Create a BillWise account</h1>
+
+        <p th:if="${registrationError}" th:text="${registrationError}">
+            Registration failed.
+        </p>
+
+        <form th:action="@{/register}" th:object="${registrationForm}" method="post">
+            <div>
+                <label for="username">Username</label>
+
+                <input id="username" type="text" th:field="*{username}" autocomplete="username">
+
+                <p th:if="${#fields.hasErrors('username')}" th:errors="*{username}">
+                    Invalid username
+                </p>
+            </div>
+
+            <div>
+                <label for="email">Email</label>
+
+                <input id="email" type="email" th:field="*{email}" autocomplete="email">
+
+                <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}">
+                    Invalid email
+                </p>
+            </div>
+
+            <div>
+                <label for="password">Password</label>
+
+                <input id="password" type="password" th:field="*{password}" autocomplete="new-password">
+
+                <p th:if="${#fields.hasErrors('password')}" th:errors="*{password}">
+                    Invalid password
+                </p>
+            </div>
+
+            <div>
+                <label for="preferredCurrency">
+                    Preferred currency
+                </label>
+
+                <select id="preferredCurrency" th:field="*{preferredCurrency}">
+                    <option value="">Select currency</option>
+                    <option value="EUR">EUR</option>
+                    <option value="USD">USD</option>
+                    <option value="GBP">GBP</option>
+                    <option value="JPY">JPY</option>
+                </select>
+
+                <p th:if="${#fields.hasErrors('preferredCurrency')}" th:errors="*{preferredCurrency}">
+                    Invalid currency
+                </p>
+            </div>
+
+            <button type="submit">Create account</button>
+        </form>
+
+        <p>
+            Already have an account?
+            <a href="/login">Log in</a>
+        </p>
+
+        <a href="/">Return to home</a>
+    </main>
+</body>
+
+</html>
