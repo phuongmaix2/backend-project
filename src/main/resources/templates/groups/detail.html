@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Group Details - BillWise</title>
+</head>
+
+<body>
+
+    <h1 th:text="${group.name}">Group name</h1>
+
+    <p>
+        Description:
+        <span th:text="${group.description}">
+            Group description
+        </span>
+    </p>
+
+    <p>
+        Base currency:
+        <span th:text="${group.baseCurrency}">EUR</span>
+    </p>
+
+    <p>
+        Owner:
+        <span th:text="${group.ownerUsername}">
+            Owner username
+        </span>
+    </p>
+
+    <h2>Members</h2>
+
+    <ul>
+        <li th:each="member : ${members}">
+            <span th:text="${member.username}">
+                Username
+            </span>
+
+            <span>
+                (
+                <span th:text="${member.role}">MEMBER</span>
+                )
+            </span>
+
+            <form th:if="${
+                currentUsername == group.ownerUsername
+                and member.userId != group.ownerId
+            }" th:action="@{/groups/{groupId}/members/{userId}/remove(
+                groupId=${group.id},
+                userId=${member.userId}
+            )}" method="post" style="display: inline;">
+
+                <button type="submit">Remove</button>
+            </form>
+        </li>
+    </ul>
+
+    <section th:if="${currentUsername == group.ownerUsername}">
+
+        <h2>Add a member</h2>
+
+        <form th:action="@{/groups/{id}/members(id=${group.id})}" th:object="${addGroupMemberRequest}" method="post">
+
+            <div>
+                <label for="usernameOrEmail">
+                    Username or email
+                </label>
+
+                <input id="usernameOrEmail" type="text" th:field="*{usernameOrEmail}">
+
+                <p th:if="${#fields.hasErrors('usernameOrEmail')}" th:errors="*{usernameOrEmail}">
+                    Member error
+                </p>
+            </div>
+
+            <button type="submit">Add member</button>
+        </form>
+
+    </section>
+
+    <p>
+        <a th:href="@{/groups}">Back to my groups</a>
+    </p>
+
+</body>
+
+</html>

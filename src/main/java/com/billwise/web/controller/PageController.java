@@ -1,5 +1,7 @@
 package com.billwise.web.controller;
 
+import com.billwise.service.GroupService;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -7,6 +9,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class PageController {
+
+    private final GroupService groupService;
+
+    public PageController(GroupService groupService) {
+        this.groupService = groupService;
+    }
 
     @GetMapping("/")
     public String home() {
@@ -22,10 +30,16 @@ public class PageController {
     public String dashboard(
             Authentication authentication,
             Model model) {
+
+        String username = authentication.getName();
+
+        model.addAttribute("username", username);
+
         model.addAttribute(
-                "username",
-                authentication.getName());
+                "groups",
+                groupService.findGroupsForUser(username));
 
         return "dashboard";
     }
+
 }

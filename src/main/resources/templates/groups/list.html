@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>My Groups - BillWise</title>
+</head>
+<body>
+
+    <h1>My groups</h1>
+
+    <p>
+        <a th:href="@{/dashboard}">Back to dashboard</a>
+    </p>
+
+    <p>
+        <a th:href="@{/groups/new}">Create a new group</a>
+    </p>
+
+    <p th:if="${#lists.isEmpty(groups)}">
+        You do not have any groups yet.
+    </p>
+
+    <div th:each="group : ${groups}">
+        <h2 th:text="${group.name}">Group name</h2>
+
+        <p th:text="${group.description}">
+            Group description
+        </p>
+
+        <p>
+            Currency:
+            <span th:text="${group.baseCurrency}">EUR</span>
+        </p>
+
+        <p>
+            Owner:
+            <span th:text="${group.ownerUsername}">
+                Username
+            </span>
+        </p>
+
+        <a th:href="@{/groups/{id}(id=${group.id})}">
+            View group
+        </a>
+
+        <hr>
+    </div>
+
+</body>
+</html>
