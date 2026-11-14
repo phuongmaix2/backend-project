@@ -27,6 +27,6 @@ class ErrorTemplateTests {
         assertThat(html)
                 .contains("404")
                 .contains("Page not found")
-                .contains("Return to BillWise");
+                .contains("Return to dashboard");
     }
 }
