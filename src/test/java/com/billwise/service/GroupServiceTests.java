@@ -10,6 +10,8 @@ import com.billwise.repository.UserRepository;
 import com.billwise.web.dto.group.GroupRequest;
 import com.billwise.web.dto.group.GroupResponse;
 import com.billwise.exception.ForbiddenOperationException;
+import com.billwise.web.dto.group.AddGroupMemberRequest;
+import com.billwise.exception.ConflictException;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,6 +28,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 
 @ExtendWith(MockitoExtension.class)
 class GroupServiceTests {
@@ -161,5 +164,178 @@ class GroupServiceTests {
                 groupService.deleteGroup(10L, "owner");
 
                 verify(groupRepository).delete(group);
+        }
+
+        @Test
+        void allowsOwnerToAddMember() {
+                User owner = mock(User.class);
+                User newMember = mock(User.class);
+                ExpenseGroup group = mock(ExpenseGroup.class);
+
+                when(owner.getId()).thenReturn(1L);
+                when(newMember.getId()).thenReturn(2L);
+                when(newMember.getUsername()).thenReturn("member");
+                when(newMember.getEmail())
+                                .thenReturn("member@example.com");
+                when(group.getOwner()).thenReturn(owner);
+
+                when(userRepository.findByUsername("owner"))
+                                .thenReturn(Optional.of(owner));
+
+                when(userRepository.findByEmail(
+                                "member@example.com"))
+                                .thenReturn(Optional.of(newMember));
+
+                when(groupRepository.findById(10L))
+                                .thenReturn(Optional.of(group));
+
+                when(memberRepository.existsByGroupIdAndUserId(
+                                10L,
+                                2L))
+                                .thenReturn(false);
+
+                when(memberRepository.save(any(GroupMember.class)))
+                                .thenAnswer(invocation -> invocation.getArgument(0));
+
+                AddGroupMemberRequest request = new AddGroupMemberRequest();
+
+                request.setUsernameOrEmail(
+                                " MEMBER@EXAMPLE.COM ");
+
+                var response = groupService.addMember(
+                                10L,
+                                "owner",
+                                request);
+
+                assertThat(response.userId()).isEqualTo(2L);
+                assertThat(response.username()).isEqualTo("member");
+                assertThat(response.role())
+                                .isEqualTo(GroupRole.MEMBER);
+
+                verify(memberRepository)
+                                .save(any(GroupMember.class));
+        }
+
+        @Test
+        void rejectsDuplicateGroupMember() {
+                User owner = mock(User.class);
+                User existingMember = mock(User.class);
+                ExpenseGroup group = mock(ExpenseGroup.class);
+
+                when(owner.getId()).thenReturn(1L);
+                when(existingMember.getId()).thenReturn(2L);
+                when(group.getOwner()).thenReturn(owner);
+
+                when(userRepository.findByUsername("owner"))
+                                .thenReturn(Optional.of(owner));
+
+                when(userRepository.findByUsername("member"))
+                                .thenReturn(Optional.of(existingMember));
+
+                when(groupRepository.findById(10L))
+                                .thenReturn(Optional.of(group));
+
+                when(memberRepository.existsByGroupIdAndUserId(
+                                10L,
+                                2L))
+                                .thenReturn(true);
+
+                AddGroupMemberRequest request = new AddGroupMemberRequest();
+
+                request.setUsernameOrEmail("member");
+
+                assertThatThrownBy(() -> groupService.addMember(
+                                10L,
+                                "owner",
+                                request))
+                                .isInstanceOf(ConflictException.class)
+                                .hasMessage(
+                                                "User is already a group member");
+
+                verify(memberRepository, never())
+                                .save(any(GroupMember.class));
+        }
+
+        @Test
+        void allowsOwnerToRemoveMember() {
+                User owner = mock(User.class);
+                ExpenseGroup group = mock(ExpenseGroup.class);
+                GroupMember membership = mock(GroupMember.class);
+
+                when(owner.getId()).thenReturn(1L);
+                when(group.getOwner()).thenReturn(owner);
+
+                when(userRepository.findByUsername("owner"))
+                                .thenReturn(Optional.of(owner));
+
+                when(groupRepository.findById(10L))
+                                .thenReturn(Optional.of(group));
+
+                when(memberRepository.findByGroupIdAndUserId(
+                                10L,
+                                2L))
+                                .thenReturn(Optional.of(membership));
+
+                groupService.removeMember(
+                                10L,
+                                2L,
+                                "owner");
+
+                verify(memberRepository).delete(membership);
+        }
+
+        @Test
+        void rejectsRemovingGroupOwner() {
+                User owner = mock(User.class);
+                ExpenseGroup group = mock(ExpenseGroup.class);
+
+                when(owner.getId()).thenReturn(1L);
+                when(group.getOwner()).thenReturn(owner);
+
+                when(userRepository.findByUsername("owner"))
+                                .thenReturn(Optional.of(owner));
+
+                when(groupRepository.findById(10L))
+                                .thenReturn(Optional.of(group));
+
+                assertThatThrownBy(() -> groupService.removeMember(
+                                10L,
+                                1L,
+                                "owner"))
+                                .isInstanceOf(ConflictException.class)
+                                .hasMessage(
+                                                "The group owner cannot be removed");
+
+                verify(memberRepository, never())
+                                .delete(any(GroupMember.class));
+        }
+
+        @Test
+        void rejectsMemberRemovalByNonOwner() {
+                User currentMember = mock(User.class);
+                User owner = mock(User.class);
+                ExpenseGroup group = mock(ExpenseGroup.class);
+
+                when(currentMember.getId()).thenReturn(2L);
+                when(owner.getId()).thenReturn(1L);
+                when(group.getOwner()).thenReturn(owner);
+
+                when(userRepository.findByUsername("member"))
+                                .thenReturn(Optional.of(currentMember));
+
+                when(groupRepository.findById(10L))
+                                .thenReturn(Optional.of(group));
+
+                assertThatThrownBy(() -> groupService.removeMember(
+                                10L,
+                                3L,
+                                "member"))
+                                .isInstanceOf(
+                                                ForbiddenOperationException.class)
+                                .hasMessage(
+                                                "Only the group owner can perform this operation");
+
+                verify(memberRepository, never())
+                                .delete(any(GroupMember.class));
         }
 }
