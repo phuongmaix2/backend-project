@@ -11,6 +11,16 @@ import com.billwise.repository.GroupMemberRepository;
 import com.billwise.repository.UserRepository;
 import com.billwise.web.dto.expense.ExpenseRequest;
 import com.billwise.web.dto.expense.ExpenseResponse;
+import com.billwise.repository.ExpenseShareRepository;
+import com.billwise.domain.ExpenseShare;
+import com.billwise.exception.ConflictException;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,17 +36,22 @@ public class ExpenseService {
     private final UserRepository userRepository;
     private final ExpenseGroupRepository groupRepository;
     private final GroupMemberRepository memberRepository;
+    private final ExpenseShareRepository expenseShareRepository;
 
     public ExpenseService(
             ExpenseRepository expenseRepository,
             UserRepository userRepository,
             ExpenseGroupRepository groupRepository,
-            GroupMemberRepository memberRepository) {
+            GroupMemberRepository memberRepository,
+            ExpenseShareRepository expenseShareRepository) {
+        {
 
-        this.expenseRepository = expenseRepository;
-        this.userRepository = userRepository;
-        this.groupRepository = groupRepository;
-        this.memberRepository = memberRepository;
+            this.expenseRepository = expenseRepository;
+            this.userRepository = userRepository;
+            this.groupRepository = groupRepository;
+            this.memberRepository = memberRepository;
+            this.expenseShareRepository = expenseShareRepository;
+        }
     }
 
     @Transactional
@@ -82,8 +97,19 @@ public class ExpenseService {
                 request.getCategory(),
                 request.getSplitMethod());
 
-        return ExpenseResponse.from(
-                expenseRepository.save(expense));
+        Expense savedExpense = expenseRepository.save(expense);
+
+        List<User> participants = resolveParticipants(
+                group,
+                creator,
+                request.getParticipantUsernamesOrEmails());
+
+        expenseShareRepository.saveAll(
+                buildEqualShares(
+                        savedExpense,
+                        participants));
+
+        return ExpenseResponse.from(savedExpense);
     }
 
     @Transactional(readOnly = true)
@@ -116,6 +142,85 @@ public class ExpenseService {
                 .stream()
                 .map(ExpenseResponse::from)
                 .toList();
+    }
+
+    private List<User> resolveParticipants(
+            ExpenseGroup group,
+            User creator,
+            List<String> participantValues) {
+
+        if (group == null) {
+            return new ArrayList<>(
+                    List.of(creator));
+        }
+
+        if (participantValues == null
+                || participantValues.isEmpty()) {
+
+            throw new ConflictException(
+                    "At least one participant is required");
+        }
+
+        List<User> participants = new ArrayList<>();
+        Set<Long> participantIds = new HashSet<>();
+
+        for (String participantValue : participantValues) {
+            User participant = findUserByUsernameOrEmail(
+                    participantValue);
+
+            requireMember(
+                    group.getId(),
+                    participant.getId());
+
+            if (!participantIds.add(participant.getId())) {
+                throw new ConflictException(
+                        "Duplicate participant");
+            }
+
+            participants.add(participant);
+        }
+
+        return participants;
+    }
+
+    private List<ExpenseShare> buildEqualShares(
+            Expense expense,
+            List<User> participants) {
+
+        participants.sort(
+                Comparator.comparing(
+                        User::getId,
+                        Comparator.nullsLast(
+                                Comparator.naturalOrder())));
+
+        BigDecimal total = expense.getAmount()
+                .setScale(2, RoundingMode.HALF_UP);
+
+        long totalCents = total.movePointRight(2)
+                .longValueExact();
+
+        long baseCents = totalCents / participants.size();
+
+        long remainingCents = totalCents % participants.size();
+
+        List<ExpenseShare> shares = new ArrayList<>();
+
+        for (int index = 0; index < participants.size(); index++) {
+
+            long participantCents = baseCents
+                    + (index < remainingCents ? 1 : 0);
+
+            BigDecimal shareAmount = BigDecimal.valueOf(participantCents)
+                    .movePointLeft(2);
+
+            shares.add(
+                    new ExpenseShare(
+                            expense,
+                            participants.get(index),
+                            shareAmount));
+        }
+
+        return shares;
     }
 
     private User resolvePayer(

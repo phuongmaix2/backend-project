@@ -11,6 +11,8 @@ import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ExpenseRequest {
 
@@ -20,15 +22,15 @@ public class ExpenseRequest {
     // Optional for personal expenses.
     private String payerUsernameOrEmail;
 
+    // Users who participate in splitting this expense.
+    private List<String> participantUsernamesOrEmails = new ArrayList<>();
+
     @NotBlank(message = "Description is required")
     @Size(max = 200, message = "Description must not exceed 200 characters")
     private String description;
 
     @NotNull(message = "Amount is required")
-    @DecimalMin(
-            value = "0.01",
-            message = "Amount must be greater than zero"
-    )
+    @DecimalMin(value = "0.01", message = "Amount must be greater than zero")
     private BigDecimal amount;
 
     @NotBlank(message = "Currency is required")
@@ -63,6 +65,16 @@ public class ExpenseRequest {
 
     public String getDescription() {
         return description;
+    }
+
+    public List<String> getParticipantUsernamesOrEmails() {
+        return participantUsernamesOrEmails;
+    }
+
+    public void setParticipantUsernamesOrEmails(
+            List<String> participantUsernamesOrEmails) {
+
+        this.participantUsernamesOrEmails = participantUsernamesOrEmails;
     }
 
     public void setDescription(String description) {
