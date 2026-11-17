@@ -28,6 +28,7 @@ public class SecurityConfig {
                 "/login",
                 "/register",
                 "/api/v1/auth/register",
+                "/api/v1/auth/login",
                 "/error",
                 "/css/**",
                 "/js/**",
