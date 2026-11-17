@@ -8,6 +8,7 @@ import com.billwise.domain.ExpenseCategory;
 import com.billwise.domain.SplitMethod;
 import com.billwise.web.dto.expense.ExpenseRequest;
 import com.billwise.service.BalanceService;
+import com.billwise.service.ReportService;
 
 import java.time.LocalDate;
 
@@ -28,15 +29,18 @@ public class GroupPageController {
     private final GroupService groupService;
     private final ExpenseService expenseService;
     private final BalanceService balanceService;
+    private final ReportService reportService;
 
     public GroupPageController(
             GroupService groupService,
             ExpenseService expenseService,
-            BalanceService balanceService) {
+            BalanceService balanceService,
+            ReportService reportService) {
 
         this.groupService = groupService;
         this.expenseService = expenseService;
         this.balanceService = balanceService;
+        this.reportService = reportService;
     }
 
     @GetMapping("/groups")
@@ -137,6 +141,12 @@ public class GroupPageController {
         model.addAttribute(
                 "balances",
                 balanceService.calculateBalances(
+                        groupId,
+                        currentUsername));
+
+        model.addAttribute(
+                "categoryReport",
+                reportService.spendingByCategory(
                         groupId,
                         currentUsername));
 

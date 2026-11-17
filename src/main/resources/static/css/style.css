@@ -315,6 +315,28 @@ input[type="checkbox"] {
     text-align: right;
 }
 
+.report-list {
+    display: grid;
+    gap: 10px;
+    width: 100%;
+    max-width: 760px;
+    margin: 0 auto;
+}
+
+.report-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--card);
+}
+
+.report-total {
+    color: var(--primary-dark);
+}
+
 .simple-card {
     width: 100%;
     max-width: 760px;

@@ -115,6 +115,30 @@
         </div>
     </section>
 
+    <section class="content-section">
+        <div class="section-title-row">
+            <h2>Spending by category</h2>
+            <span class="muted">Total expenses</span>
+        </div>
+
+        <p class="empty-card" th:if="${#lists.isEmpty(categoryReport)}">
+            No spending data yet.
+        </p>
+
+        <div class="report-list">
+            <div class="report-row" th:each="item : ${categoryReport}">
+                <strong th:text="${item.label}">
+                    FOOD
+                </strong>
+
+                <strong class="report-total">
+                    <span th:text="${item.total}">0.00</span>
+                    <span th:text="${group.baseCurrency}">EUR</span>
+                </strong>
+            </div>
+        </div>
+    </section>
+
     <a class="back-link" th:href="@{/dashboard}">← Back to dashboard</a>
 </main>
 
