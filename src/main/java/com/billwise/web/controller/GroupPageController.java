@@ -3,6 +3,13 @@ package com.billwise.web.controller;
 import com.billwise.service.GroupService;
 import com.billwise.web.dto.group.GroupRequest;
 import com.billwise.web.dto.group.AddGroupMemberRequest;
+import com.billwise.service.ExpenseService;
+import com.billwise.domain.ExpenseCategory;
+import com.billwise.domain.SplitMethod;
+import com.billwise.web.dto.expense.ExpenseRequest;
+import com.billwise.service.BalanceService;
+
+import java.time.LocalDate;
 
 import jakarta.validation.Valid;
 
@@ -19,9 +26,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class GroupPageController {
 
     private final GroupService groupService;
+    private final ExpenseService expenseService;
+    private final BalanceService balanceService;
 
-    public GroupPageController(GroupService groupService) {
+    public GroupPageController(
+            GroupService groupService,
+            ExpenseService expenseService,
+            BalanceService balanceService) {
+
         this.groupService = groupService;
+        this.expenseService = expenseService;
+        this.balanceService = balanceService;
     }
 
     @GetMapping("/groups")
@@ -58,6 +73,41 @@ public class GroupPageController {
         return "redirect:/groups";
     }
 
+    @GetMapping("/groups/{groupId}/expenses/new")
+    public String showCreateExpenseForm(
+            @PathVariable Long groupId,
+            Authentication authentication,
+            Model model) {
+
+        String currentUsername = authentication.getName();
+
+        model.addAttribute(
+                "group",
+                groupService.findGroupForUser(
+                        groupId,
+                        currentUsername));
+
+        model.addAttribute(
+                "members",
+                groupService.findMembers(
+                        groupId,
+                        currentUsername));
+
+        ExpenseRequest request = new ExpenseRequest();
+
+        request.setCurrency("EUR");
+        request.setExpenseDate(LocalDate.now());
+        request.setCategory(ExpenseCategory.FOOD);
+        request.setSplitMethod(SplitMethod.EQUAL);
+        request.setPayerUsernameOrEmail(currentUsername);
+
+        model.addAttribute(
+                "expenseRequest",
+                request);
+
+        return "groups/expense-form";
+    }
+
     @GetMapping("/groups/{groupId}")
     public String showGroup(
             @PathVariable Long groupId,
@@ -75,6 +125,18 @@ public class GroupPageController {
         model.addAttribute(
                 "members",
                 groupService.findMembers(
+                        groupId,
+                        currentUsername));
+
+        model.addAttribute(
+                "expenses",
+                expenseService.findGroupExpenses(
+                        groupId,
+                        currentUsername));
+
+        model.addAttribute(
+                "balances",
+                balanceService.calculateBalances(
                         groupId,
                         currentUsername));
 
@@ -116,6 +178,16 @@ public class GroupPageController {
                     "currentUsername",
                     currentUsername);
 
+            model.addAttribute(
+                    "expenses",
+                    expenseService.findGroupExpenses(
+                            groupId,
+                            currentUsername));
+
+            model.addAttribute(
+                    "addGroupMemberRequest",
+                    request);
+
             return "groups/detail";
         }
 
@@ -137,6 +209,51 @@ public class GroupPageController {
                 groupId,
                 userId,
                 authentication.getName());
+
+        return "redirect:/groups/" + groupId;
+    }
+
+    @PostMapping("/groups/{groupId}/expenses")
+    public String createGroupExpense(
+            @PathVariable Long groupId,
+            @Valid @ModelAttribute("expenseRequest") ExpenseRequest request,
+            BindingResult bindingResult,
+            Authentication authentication,
+            Model model) {
+
+        String currentUsername = authentication.getName();
+
+        request.setGroupId(groupId);
+
+        if (request.getParticipantUsernamesOrEmails() == null
+                || request.getParticipantUsernamesOrEmails().isEmpty()) {
+
+            bindingResult.rejectValue(
+                    "participantUsernamesOrEmails",
+                    "participants.required",
+                    "Select at least one participant"
+            );
+        }
+
+        if (bindingResult.hasErrors()) {
+            model.addAttribute(
+                    "group",
+                    groupService.findGroupForUser(
+                            groupId,
+                            currentUsername));
+
+            model.addAttribute(
+                    "members",
+                    groupService.findMembers(
+                            groupId,
+                            currentUsername));
+
+            return "groups/expense-form";
+        }
+
+        expenseService.createExpense(
+                currentUsername,
+                request);
 
         return "redirect:/groups/" + groupId;
     }

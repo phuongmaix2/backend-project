@@ -79,6 +79,95 @@
 
     </section>
 
+    <section>
+        <h2>Expenses</h2>
+
+        <p>
+            <a th:href="@{/groups/{id}/expenses/new(id=${group.id})}">
+                Add expense
+            </a>
+        </p>
+
+        <p th:if="${#lists.isEmpty(expenses)}">
+            No expenses yet.
+        </p>
+
+        <div th:each="expense : ${expenses}">
+            <h3 th:text="${expense.description}">
+                Expense description
+            </h3>
+
+            <p>
+                Amount:
+                <span th:text="${expense.amount}">
+                    0.00
+                </span>
+                <span th:text="${expense.currency}">
+                    EUR
+                </span>
+            </p>
+
+            <p>
+                Paid by:
+                <span th:text="${expense.payerUsername}">
+                    Username
+                </span>
+            </p>
+
+            <p>
+                Category:
+                <span th:text="${expense.category}">
+                    FOOD
+                </span>
+            </p>
+
+            <p>
+                Date:
+                <span th:text="${expense.expenseDate}">
+                    2026-11-15
+                </span>
+            </p>
+
+            <hr>
+        </div>
+    </section>
+
+    <section>
+        <h2>Balances</h2>
+
+        <p th:if="${#lists.isEmpty(balances)}">
+            No balances available.
+        </p>
+
+        <div th:each="balance : ${balances}">
+            <p>
+                <strong th:text="${balance.username}">
+                    Username
+                </strong>:
+
+                <span th:if="${balance.balance > 0}">
+                    Gets
+                </span>
+
+                <span th:if="${balance.balance < 0}">
+                    Owes
+                </span>
+
+                <span th:if="${balance.balance == 0}">
+                    Settled
+                </span>
+
+                <span th:text="${balance.balance}">
+                    0.00
+                </span>
+
+                <span th:text="${group.baseCurrency}">
+                    EUR
+                </span>
+            </p>
+        </div>
+    </section>
+
     <p>
         <a th:href="@{/groups}">Back to my groups</a>
     </p>
