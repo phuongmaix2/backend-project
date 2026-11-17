@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Add Expense - BillWise</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 
 <body>
@@ -73,7 +74,7 @@
         </div>
 
         <div>
-            <p>Category</p>
+            <p class="field-label">Category</p>
 
             <select th:field="*{category}" required>
                 <option value="FOOD">Food</option>
@@ -92,7 +93,7 @@
         </div>
 
         <div>
-            <p>Split method</p>
+            <p class="field-label">Split method</p>
 
             <select th:field="*{splitMethod}" required>
                 <option value="EQUAL">Split equally</option>
@@ -104,7 +105,7 @@
         </div>
 
         <div>
-            <p>Participants</p>
+            <p class="field-label">Participants</p>
 
             <p
                 th:if="${#fields.hasErrors('participantUsernamesOrEmails')}"
@@ -112,7 +113,7 @@
                 Select at least one participant
             </p>
 
-            <label th:each="member : ${members}">
+            <label class="participant-option" th:each="member : ${members}">
                 <input type="checkbox" th:field="*{participantUsernamesOrEmails}" th:value="${member.username}">
 
                 <span th:text="${member.username}">

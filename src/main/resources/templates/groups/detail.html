@@ -4,63 +4,50 @@
 <head>
     <meta charset="UTF-8">
     <title>Group Details - BillWise</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 
 <body>
+<main class="page-shell">
 
-    <h1 th:text="${group.name}">Group name</h1>
+    <div class="page-header">
+        <div>
+            <a class="back-link" th:href="@{/dashboard}">← Dashboard</a>
+            <h1 th:text="${group.name}">Group name</h1>
+        </div>
+        <span class="currency-badge" th:text="${group.baseCurrency}">EUR</span>
+    </div>
 
-    <p>
-        Description:
-        <span th:text="${group.description}">
-            Group description
-        </span>
+    <p class="group-description" th:text="${group.description}">
+        Group description
     </p>
+    <p class="muted">Owner: <strong th:text="${group.ownerUsername}">Owner</strong></p>
 
-    <p>
-        Base currency:
-        <span th:text="${group.baseCurrency}">EUR</span>
-    </p>
+    <section class="content-section">
+        <div class="section-title-row">
+            <h2>Members</h2>
+            <span class="section-count" th:text="${#lists.size(members)} + ' people'">0 people</span>
+        </div>
 
-    <p>
-        Owner:
-        <span th:text="${group.ownerUsername}">
-            Owner username
-        </span>
-    </p>
+        <ul class="member-list">
+            <li class="member-row" th:each="member : ${members}">
+                <div>
+                    <strong class="member-name" th:text="${member.username}">Username</strong>
+                    <span class="role-badge" th:text="${member.role}">MEMBER</span>
+                </div>
 
-    <h2>Members</h2>
+                <form class="inline-form" th:if="${currentUsername == group.ownerUsername and member.userId != group.ownerId}" th:action="@{/groups/{groupId}/members/{userId}/remove(groupId=${group.id}, userId=${member.userId})}" method="post">
+                    <button class="button-danger" type="submit">Remove</button>
+                </form>
+            </li>
+        </ul>
+    </section>
 
-    <ul>
-        <li th:each="member : ${members}">
-            <span th:text="${member.username}">
-                Username
-            </span>
-
-            <span>
-                (
-                <span th:text="${member.role}">MEMBER</span>
-                )
-            </span>
-
-            <form th:if="${
-                currentUsername == group.ownerUsername
-                and member.userId != group.ownerId
-            }" th:action="@{/groups/{groupId}/members/{userId}/remove(
-                groupId=${group.id},
-                userId=${member.userId}
-            )}" method="post" style="display: inline;">
-
-                <button type="submit">Remove</button>
-            </form>
-        </li>
-    </ul>
-
-    <section th:if="${currentUsername == group.ownerUsername}">
+    <section class="content-section compact-section" th:if="${currentUsername == group.ownerUsername}">
 
         <h2>Add a member</h2>
 
-        <form th:action="@{/groups/{id}/members(id=${group.id})}" th:object="${addGroupMemberRequest}" method="post">
+        <form class="form-card" th:action="@{/groups/{id}/members(id=${group.id})}" th:object="${addGroupMemberRequest}" method="post">
 
             <div>
                 <label for="usernameOrEmail">
@@ -79,98 +66,57 @@
 
     </section>
 
-    <section>
-        <h2>Expenses</h2>
+    <section class="content-section">
+        <div class="section-title-row">
+            <h2>Expenses</h2>
+            <a class="button" th:href="@{/groups/{id}/expenses/new(id=${group.id})}">+ Add expense</a>
+        </div>
 
-        <p>
-            <a th:href="@{/groups/{id}/expenses/new(id=${group.id})}">
-                Add expense
-            </a>
-        </p>
-
-        <p th:if="${#lists.isEmpty(expenses)}">
+        <p class="empty-card" th:if="${#lists.isEmpty(expenses)}">
             No expenses yet.
         </p>
 
-        <div th:each="expense : ${expenses}">
-            <h3 th:text="${expense.description}">
-                Expense description
-            </h3>
-
-            <p>
-                Amount:
-                <span th:text="${expense.amount}">
-                    0.00
-                </span>
-                <span th:text="${expense.currency}">
-                    EUR
-                </span>
-            </p>
-
-            <p>
-                Paid by:
-                <span th:text="${expense.payerUsername}">
-                    Username
-                </span>
-            </p>
-
-            <p>
-                Category:
-                <span th:text="${expense.category}">
-                    FOOD
-                </span>
-            </p>
-
-            <p>
-                Date:
-                <span th:text="${expense.expenseDate}">
-                    2026-11-15
-                </span>
-            </p>
-
-            <hr>
+        <div class="expense-list">
+            <article class="expense-card" th:each="expense : ${expenses}">
+                <div>
+                    <h3 th:text="${expense.description}">Expense description</h3>
+                    <p class="muted">
+                        Paid by <strong th:text="${expense.payerUsername}">Username</strong>
+                        · <span th:text="${expense.category}">FOOD</span>
+                        · <span th:text="${expense.expenseDate}">2026-11-15</span>
+                    </p>
+                </div>
+                <strong class="expense-amount">
+                    <span th:text="${expense.amount}">0.00</span>
+                    <span th:text="${expense.currency}">EUR</span>
+                </strong>
+            </article>
         </div>
     </section>
 
-    <section>
-        <h2>Balances</h2>
+    <section class="content-section">
+        <div class="section-title-row">
+            <h2>Balances</h2>
+            <span class="muted">Current balance</span>
+        </div>
 
         <p th:if="${#lists.isEmpty(balances)}">
             No balances available.
         </p>
 
-        <div th:each="balance : ${balances}">
-            <p>
-                <strong th:text="${balance.username}">
-                    Username
-                </strong>:
-
-                <span th:if="${balance.balance > 0}">
-                    Gets
-                </span>
-
-                <span th:if="${balance.balance < 0}">
-                    Owes
-                </span>
-
-                <span th:if="${balance.balance == 0}">
-                    Settled
-                </span>
-
-                <span th:text="${balance.balance}">
-                    0.00
-                </span>
-
-                <span th:text="${group.baseCurrency}">
-                    EUR
-                </span>
-            </p>
+        <div class="balance-list">
+            <div class="balance-row" th:each="balance : ${balances}">
+                <strong th:text="${balance.username}">Username</strong>
+                <span class="balance-status" th:if="${balance.balance > 0}">Gets</span>
+                <span class="balance-status" th:if="${balance.balance < 0}">Owes</span>
+                <span class="balance-status" th:if="${balance.balance == 0}">Settled</span>
+                <strong class="balance-value" th:text="${balance.balance + ' ' + group.baseCurrency}">0.00 EUR</strong>
+            </div>
         </div>
     </section>
 
-    <p>
-        <a th:href="@{/groups}">Back to my groups</a>
-    </p>
+    <a class="back-link" th:href="@{/dashboard}">← Back to dashboard</a>
+</main>
 
 </body>
 

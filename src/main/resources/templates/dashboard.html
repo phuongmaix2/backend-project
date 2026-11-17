@@ -5,18 +5,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Dashboard | BillWise</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 
 <body>
-    <header>
-        <h1>BillWise Dashboard</h1>
+    <header class="topbar">
+        <h1>BillWise</h1>
 
         <form th:action="@{/logout}" method="post">
-            <button type="submit">Log out</button>
+            <button class="button-secondary" type="submit">Log out</button>
         </form>
     </header>
 
-    <main>
+    <main class="page-shell">
         <h2>
             Welcome,
             <span th:text="${username}">user</span>!
@@ -26,18 +27,20 @@
             Manage your shared expenses and groups here.
         </p>
 
-        <section>
-            <h2>My groups</h2>
+        <section class="content-section">
+            <div class="section-title-row">
+                <h2>My groups</h2>
 
-            <p>
-                <a th:href="@{/groups/new}">Create a new group</a>
-            </p>
+                <a class="button" th:href="@{/groups/new}">
+                    + Create group
+                </a>
+            </div>
 
             <p th:if="${#lists.isEmpty(groups)}">
                 You do not have any groups yet.
             </p>
 
-            <div th:each="group : ${groups}">
+            <div class="simple-card" th:each="group : ${groups}">
                 <h3 th:text="${group.name}">Group name</h3>
 
                 <p th:text="${group.description}">
@@ -53,7 +56,6 @@
                     View group details
                 </a>
 
-                <hr>
             </div>
         </section>
     </main>
