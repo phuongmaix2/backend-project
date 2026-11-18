@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+/** Builds a user's net position from what they paid and what they consumed. */
 @Service
 public class BalanceService {
 
@@ -46,6 +47,11 @@ public class BalanceService {
         this.shareRepository = shareRepository;
     }
 
+    /**
+     * A positive balance means the group owes the member; a negative balance
+     * means the member owes the group. Shares are read from their stored
+     * snapshots so later edits to exchange rates cannot change history.
+     */
     @Transactional(readOnly = true)
     public List<BalanceResponse> calculateBalances(
             Long groupId,

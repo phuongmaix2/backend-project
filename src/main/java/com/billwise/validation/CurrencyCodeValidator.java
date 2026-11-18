@@ -13,7 +13,6 @@ public class CurrencyCodeValidator
     public boolean isValid(
             String value,
             ConstraintValidatorContext context) {
-        // Null and blank values should be handled separately by @NotBlank.
         if (value == null || value.isBlank()) {
             return true;
         }

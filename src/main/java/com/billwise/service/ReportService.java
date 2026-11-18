@@ -19,6 +19,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/** Produces read-only spending summaries from persisted group expenses. */
 @Service
 public class ReportService {
 
@@ -39,6 +40,7 @@ public class ReportService {
         this.expenseRepository = expenseRepository;
     }
 
+    /** Groups expense totals by category for the authenticated group member. */
     @Transactional(readOnly = true)
     public List<SpendingReportItem> spendingByCategory(
             Long groupId,

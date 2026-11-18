@@ -5,6 +5,7 @@ import com.billwise.domain.GroupRole;
 
 import java.time.LocalDateTime;
 
+/** Safe member view returned to group participants. */
 public record GroupMemberResponse(
         Long userId,
         String username,
@@ -21,4 +22,4 @@ public record GroupMemberResponse(
                 membership.getRole(),
                 membership.getJoinedAt());
     }
-} 
+}

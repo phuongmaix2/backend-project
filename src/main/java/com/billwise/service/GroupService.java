@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
+/** Owns group CRUD and keeps membership/owner authorization in the service layer. */
 @Service
 public class GroupService {
 

@@ -5,6 +5,7 @@ import com.billwise.validation.ValidCurrency;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+/** Validated payload for creating or updating a group. */
 public class GroupRequest {
 
     @NotBlank(message = "Group name is required")

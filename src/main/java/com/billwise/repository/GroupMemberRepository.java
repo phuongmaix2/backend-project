@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.Optional;
 
+/** Database queries used to enforce group membership and owner rules. */
+
 public interface GroupMemberRepository
     extends JpaRepository<GroupMember, Long> {
 

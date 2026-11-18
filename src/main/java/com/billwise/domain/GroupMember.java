@@ -15,6 +15,8 @@ import jakarta.persistence.UniqueConstraint;
 
 import java.time.LocalDateTime;
 
+/** Join entity linking a registered user to a group and role. */
+
 @Entity
 @Table(name = "group_members", uniqueConstraints = {
         @UniqueConstraint(name = "uk_group_member", columnNames = {

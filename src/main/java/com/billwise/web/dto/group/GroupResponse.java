@@ -4,6 +4,7 @@ import com.billwise.domain.ExpenseGroup;
 
 import java.time.LocalDateTime;
 
+/** Safe group representation returned by MVC and REST endpoints. */
 public record GroupResponse(
     Long id,
     String name,

@@ -13,6 +13,8 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.Locale;
 
+/** Persistent group and its immutable owner/base-currency identity. */
+
 @Entity
 @Table(name = "expense_groups")
 public class ExpenseGroup {

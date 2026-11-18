@@ -12,6 +12,8 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.security.web.context.SecurityContextRepository;
 
 @Configuration
+/** Configures the shared session security used by 
+ * both MVC pages and JSON APIs. */
 public class SecurityConfig {
 
     @Bean
@@ -23,6 +25,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http)
             throws Exception {
 
+        // Static assets and authentication endpoints are public; 
+        // Business data is protected.
         http.authorizeHttpRequests(authorize -> authorize.requestMatchers(
                 "/",
                 "/login",

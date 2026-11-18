@@ -8,6 +8,8 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
+/** Database queries for groups and their membership relationships. */
+
 public interface ExpenseGroupRepository
         extends JpaRepository<ExpenseGroup, Long> {
 

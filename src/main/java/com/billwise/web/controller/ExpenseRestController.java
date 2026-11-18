@@ -14,6 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1")
+/** REST endpoints for personal and group expense operations. */
 public class ExpenseRestController {
 
     private final ExpenseService expenseService;

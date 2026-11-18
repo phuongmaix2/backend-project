@@ -21,6 +21,7 @@ import org.springframework.http.HttpStatus;
 
 @RestController
 @RequestMapping("/api/v1/auth")
+/** JSON authentication endpoints used by the mobile client and API tools. */
 public class AuthRestController {
 
     private final UserRegistrationService registrationService;

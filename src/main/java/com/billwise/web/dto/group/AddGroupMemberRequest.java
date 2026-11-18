@@ -3,6 +3,7 @@ package com.billwise.web.dto.group;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+/** Form payload used to find an existing user by username or email. */
 public class AddGroupMemberRequest {
 
     @NotBlank(message = "Username or email is required")

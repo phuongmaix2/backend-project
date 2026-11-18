@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Locale;
 
+/** Registers users, normalizes identity fields, and stores only encoded passwords. */
 @Service
 public class UserRegistrationService {
 

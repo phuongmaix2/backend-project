@@ -19,7 +19,6 @@ public class BillwiseApplication {
     }
 
     // Adds a demo user when the application starts.
-    // Adds a demo user when the application starts.
     @Bean
     @Profile("!test")
     public CommandLineRunner initializeDB(

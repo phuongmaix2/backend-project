@@ -24,6 +24,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/groups")
+/** REST endpoints for group management; authorization remains in GroupService. */
 public class GroupRestController {
 
     private final GroupService groupService;

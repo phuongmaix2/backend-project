@@ -10,6 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Locale;
 
+/** Adapts BillWise users to Spring Security's authentication model. */
+
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
     private final UserRepository userRepository;

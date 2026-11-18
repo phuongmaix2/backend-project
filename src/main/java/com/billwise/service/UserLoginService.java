@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Locale;
 
+/** Keeps authentication orchestration out of the REST and MVC controllers. */
 @Service
 public class UserLoginService {
 
@@ -19,6 +20,7 @@ public class UserLoginService {
         this.authenticationManager = authenticationManager;
     }
 
+    /** Delegates password verification to Spring Security's configured provider. */
     public Authentication authenticate(LoginRequest request) {
         return authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(

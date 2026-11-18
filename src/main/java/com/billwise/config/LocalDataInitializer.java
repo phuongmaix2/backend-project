@@ -8,6 +8,8 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+/** Seeds convenient local demo data only when 
+ * the local Spring profile is active. */
 @Component
 @Profile("local")
 public class LocalDataInitializer

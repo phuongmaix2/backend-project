@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 
+/** Stores one participant's share, 
+ * preserving the amount used at creation time. */
+
 @Entity
 @Table(name = "expense_shares", uniqueConstraints = {
         @UniqueConstraint(name = "uk_expense_share_participant", columnNames = {

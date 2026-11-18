@@ -4,6 +4,7 @@ import com.billwise.domain.User;
 
 import java.time.LocalDateTime;
 
+/** Public user profile response; password hashes are intentionally excluded. */
 public record UserResponse(
         Long id,
         String username,

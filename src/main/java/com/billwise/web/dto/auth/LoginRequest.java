@@ -2,6 +2,7 @@ package com.billwise.web.dto.auth;
 
 import jakarta.validation.constraints.NotBlank;
 
+/** Validated credentials submitted to the JSON login endpoint. */
 public class LoginRequest {
 
     @NotBlank(message = "Username is required")

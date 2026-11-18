@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+/** Exposes authenticated spending reports for mobile clients and API consumers. */
 @RestController
 @RequestMapping("/api/v1/groups")
 public class ReportRestController {

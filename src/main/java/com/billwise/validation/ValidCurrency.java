@@ -12,6 +12,8 @@ import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.ElementType.RECORD_COMPONENT;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+/** Bean-validation annotation for ISO-4217 currency codes such as EUR or USD. */
+
 @Documented
 @Constraint(validatedBy = CurrencyCodeValidator.class)
 @Target({
