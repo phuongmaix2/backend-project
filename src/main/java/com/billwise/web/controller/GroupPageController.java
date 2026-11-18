@@ -5,7 +5,6 @@ import com.billwise.web.dto.group.GroupRequest;
 import com.billwise.web.dto.group.AddGroupMemberRequest;
 import com.billwise.service.ExpenseService;
 import com.billwise.domain.ExpenseCategory;
-import com.billwise.domain.SplitMethod;
 import com.billwise.web.dto.expense.ExpenseRequest;
 import com.billwise.service.BalanceService;
 import com.billwise.service.ReportService;
@@ -24,6 +23,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
+/** Thymeleaf page controller for the browser UI. */
 public class GroupPageController {
 
     private final GroupService groupService;
@@ -102,7 +102,6 @@ public class GroupPageController {
         request.setCurrency("EUR");
         request.setExpenseDate(LocalDate.now());
         request.setCategory(ExpenseCategory.FOOD);
-        request.setSplitMethod(SplitMethod.EQUAL);
         request.setPayerUsernameOrEmail(currentUsername);
 
         model.addAttribute(

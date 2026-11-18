@@ -1,7 +1,6 @@
 package com.billwise.web.dto.expense;
 
 import com.billwise.domain.ExpenseCategory;
-import com.billwise.domain.SplitMethod;
 import com.billwise.validation.ValidCurrency;
 
 import jakarta.validation.constraints.DecimalMin;
@@ -16,10 +15,7 @@ import java.util.List;
 
 public class ExpenseRequest {
 
-    // Null means this is a personal expense.
     private Long groupId;
-
-    // Optional for personal expenses.
     private String payerUsernameOrEmail;
 
     // Users who participate in splitting this expense.
@@ -42,9 +38,6 @@ public class ExpenseRequest {
 
     @NotNull(message = "Category is required")
     private ExpenseCategory category;
-
-    @NotNull(message = "Split method is required")
-    private SplitMethod splitMethod;
 
     public Long getGroupId() {
         return groupId;
@@ -113,11 +106,4 @@ public class ExpenseRequest {
         this.category = category;
     }
 
-    public SplitMethod getSplitMethod() {
-        return splitMethod;
-    }
-
-    public void setSplitMethod(SplitMethod splitMethod) {
-        this.splitMethod = splitMethod;
-    }
 }

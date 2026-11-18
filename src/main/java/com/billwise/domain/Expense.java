@@ -15,7 +15,6 @@ public class Expense {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Null means this is a personal expense.
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id")
     private ExpenseGroup group;
@@ -44,10 +43,6 @@ public class Expense {
     @Column(nullable = false, length = 30)
     private ExpenseCategory category;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "split_method", nullable = false, length = 20)
-    private SplitMethod splitMethod;
-
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
@@ -62,8 +57,7 @@ public class Expense {
             BigDecimal amount,
             String currency,
             LocalDate expenseDate,
-            ExpenseCategory category,
-            SplitMethod splitMethod) {
+            ExpenseCategory category) {
 
         this.group = group;
         this.creator = creator;
@@ -73,7 +67,6 @@ public class Expense {
         this.currency = normalizeCurrency(currency);
         this.expenseDate = expenseDate;
         this.category = category;
-        this.splitMethod = splitMethod;
     }
 
     private static String normalizeCurrency(String currency) {
@@ -116,10 +109,6 @@ public class Expense {
         return category;
     }
 
-    public SplitMethod getSplitMethod() {
-        return splitMethod;
-    }
-
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -144,7 +133,4 @@ public class Expense {
         this.category = category;
     }
 
-    public void setSplitMethod(SplitMethod splitMethod) {
-        this.splitMethod = splitMethod;
-    }
 }

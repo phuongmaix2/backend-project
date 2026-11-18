@@ -93,18 +93,6 @@
         </div>
 
         <div>
-            <p class="field-label">Split method</p>
-
-            <select th:field="*{splitMethod}" required>
-                <option value="EQUAL">Split equally</option>
-            </select>
-
-            <p th:if="${#fields.hasErrors('splitMethod')}" th:errors="*{splitMethod}">
-                Split method is required
-            </p>
-        </div>
-
-        <div>
             <p class="field-label">Participants</p>
 
             <p

@@ -4,7 +4,6 @@ import com.billwise.domain.Expense;
 import com.billwise.domain.ExpenseCategory;
 import com.billwise.domain.ExpenseGroup;
 import com.billwise.domain.User;
-import com.billwise.domain.SplitMethod;
 import com.billwise.repository.ExpenseGroupRepository;
 import com.billwise.repository.ExpenseRepository;
 import com.billwise.repository.ExpenseShareRepository;
@@ -79,7 +78,6 @@ class ExpenseServiceTests {
         request.setCurrency("EUR");
         request.setExpenseDate(LocalDate.of(2026, 11, 15));
         request.setCategory(ExpenseCategory.FOOD);
-        request.setSplitMethod(SplitMethod.EQUAL);
 
         var response = expenseService.createExpense(
                 "alice",
@@ -140,7 +138,6 @@ class ExpenseServiceTests {
         request.setExpenseDate(
                 LocalDate.of(2026, 11, 15));
         request.setCategory(ExpenseCategory.FOOD);
-        request.setSplitMethod(SplitMethod.EQUAL);
 
         var response = expenseService.createExpense(
                 "alice",
@@ -243,7 +240,6 @@ class ExpenseServiceTests {
         request.setExpenseDate(
                 LocalDate.of(2026, 11, 15));
         request.setCategory(ExpenseCategory.FOOD);
-        request.setSplitMethod(SplitMethod.EQUAL);
 
         expenseService.createExpense(
                 "alice",

@@ -2,11 +2,12 @@ package com.billwise.web.dto.expense;
 
 import com.billwise.domain.Expense;
 import com.billwise.domain.ExpenseCategory;
-import com.billwise.domain.SplitMethod;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+
+// Safe representation of an expense
 
 public record ExpenseResponse(
         Long id,
@@ -18,7 +19,6 @@ public record ExpenseResponse(
         String currency,
         LocalDate expenseDate,
         ExpenseCategory category,
-        SplitMethod splitMethod,
         LocalDateTime createdAt) {
 
     public static ExpenseResponse from(
@@ -36,7 +36,6 @@ public record ExpenseResponse(
                 expense.getCurrency(),
                 expense.getExpenseDate(),
                 expense.getCategory(),
-                expense.getSplitMethod(),
                 expense.getCreatedAt());
     }
 }
