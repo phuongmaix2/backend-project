@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
+/** Applies expense validation and creates 
+ * the immutable share records used by reports and balances. */
 @Service
 public class ExpenseService {
 
@@ -54,6 +56,8 @@ public class ExpenseService {
         }
     }
 
+    /** Creates a personal or group expense and 
+     * its participant shares atomically. */
     @Transactional
     public ExpenseResponse createExpense(
             String currentUsername,
@@ -94,8 +98,7 @@ public class ExpenseService {
                 request.getAmount(),
                 request.getCurrency(),
                 request.getExpenseDate(),
-                request.getCategory(),
-                request.getSplitMethod());
+                request.getCategory());
 
         Expense savedExpense = expenseRepository.save(expense);
 
@@ -183,6 +186,10 @@ public class ExpenseService {
         return participants;
     }
 
+    /**
+     * Splits cents exactly. Any remainder is assigned by ascending user id,
+     * making the result deterministic and ensuring shares equal the total.
+     */
     private List<ExpenseShare> buildEqualShares(
             Expense expense,
             List<User> participants) {
